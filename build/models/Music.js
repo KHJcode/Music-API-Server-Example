@@ -1,6 +1,6 @@
 "use strict";
 
-module.exports = function (sequelize, DataTypes) {
+module.exports = (sequelize, DataTypes) => {
   var Music = sequelize.define('Music', {
     name: {
       type: DataTypes.STRING(50),
