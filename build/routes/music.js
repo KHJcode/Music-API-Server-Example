@@ -7,7 +7,11 @@ exports.default = void 0;
 
 var _express = _interopRequireDefault(require("express"));
 
+var _sequelize = require("sequelize");
+
 var _models = require("../models");
+
+var _length = require("../middleware/length");
 
 var _admin = require("../middleware/admin");
 
@@ -19,6 +23,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
 var router = _express.default.Router();
 
+var length_std = 15;
 router.get('/', (req, res, next) => {
   try {
     res.status(200).json('Hello, Music Router!');
@@ -26,8 +31,108 @@ router.get('/', (req, res, next) => {
     next(err);
   }
 });
-router.post('/create', _admin.adminCheck, /*#__PURE__*/function () {
+router.get('/list/:n', _length.lengthStdCheck, /*#__PURE__*/function () {
   var _ref = _asyncToGenerator(function* (req, res, next) {
+    try {
+      var {
+        n
+      } = req.params;
+      var data = yield _models.Music.findAll({
+        attributes: {
+          exclude: ['createdAt', 'updatedAt']
+        },
+        order: [['id', 'DESC']],
+        offset: (n - 1) * length_std,
+        limit: n * length_std
+      });
+      res.status(200).json(data);
+    } catch (err) {
+      next(err);
+    }
+  });
+
+  return function (_x, _x2, _x3) {
+    return _ref.apply(this, arguments);
+  };
+}());
+router.get('/search/:keyword/:n', _length.lengthStdCheck, /*#__PURE__*/function () {
+  var _ref2 = _asyncToGenerator(function* (req, res, next) {
+    try {
+      var {
+        keyword,
+        n
+      } = req.params;
+      var data = yield _models.Music.findAll({
+        where: {
+          [_sequelize.Op.or]: [{
+            name: {
+              [_sequelize.Op.like]: '%' + keyword + '%'
+            }
+          }, {
+            creater: {
+              [_sequelize.Op.like]: '%' + keyword + '%'
+            }
+          }]
+        },
+        order: [['name', 'DESC']],
+        attributes: {
+          exclude: ['createdAt', 'updatedAt']
+        },
+        offset: (n - 1) * length_std,
+        limit: n * length_std
+      });
+      res.status(200).json(data);
+    } catch (err) {
+      next(err);
+    }
+  });
+
+  return function (_x4, _x5, _x6) {
+    return _ref2.apply(this, arguments);
+  };
+}());
+router.get('/popular/:n', _length.lengthStdCheck, /*#__PURE__*/function () {
+  var _ref3 = _asyncToGenerator(function* (req, res, next) {
+    try {
+      var n = parseInt(req.params.n);
+      var data = yield _models.Music.findAll({
+        order: [['view', 'DESC']],
+        attributes: {
+          exclude: ['createdAt', 'updatedAt']
+        },
+        offset: n - 1,
+        limit: n
+      });
+      res.status(200).json(data);
+    } catch (err) {
+      next(err);
+    }
+  });
+
+  return function (_x7, _x8, _x9) {
+    return _ref3.apply(this, arguments);
+  };
+}());
+router.post('/view/:id', _admin.adminCheck, /*#__PURE__*/function () {
+  var _ref4 = _asyncToGenerator(function* (req, res, next) {
+    try {
+      var {
+        id
+      } = req.params;
+      yield _models.sequelize.query("update music set view = view + 1 where id = ".concat(id)).then(result => {
+        res.status(201).json(result ? 'success' : 'error');
+      });
+    } catch (err) {
+      next(err);
+    }
+  });
+
+  return function (_x10, _x11, _x12) {
+    return _ref4.apply(this, arguments);
+  };
+}());
+router.post('/create', _admin.adminCheck, /*#__PURE__*/function () {
+  var _ref5 = _asyncToGenerator(function* (req, res, next) {
     try {
       var {
         name,
@@ -46,12 +151,12 @@ router.post('/create', _admin.adminCheck, /*#__PURE__*/function () {
     }
   });
 
-  return function (_x, _x2, _x3) {
-    return _ref.apply(this, arguments);
+  return function (_x13, _x14, _x15) {
+    return _ref5.apply(this, arguments);
   };
 }());
 router.post('/update', _admin.adminCheck, /*#__PURE__*/function () {
-  var _ref2 = _asyncToGenerator(function* (req, res, next) {
+  var _ref6 = _asyncToGenerator(function* (req, res, next) {
     try {
       var {
         id,
@@ -75,8 +180,8 @@ router.post('/update', _admin.adminCheck, /*#__PURE__*/function () {
     }
   });
 
-  return function (_x4, _x5, _x6) {
-    return _ref2.apply(this, arguments);
+  return function (_x16, _x17, _x18) {
+    return _ref6.apply(this, arguments);
   };
 }());
 var _default = router;

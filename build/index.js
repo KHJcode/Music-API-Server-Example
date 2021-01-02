@@ -27,7 +27,7 @@ var prod = process.env.NODE_ENV === 'production';
 app.set('port', prod ? process.env.PORT : '6060');
 
 _models.sequelize.sync({
-  force: true
+  force: false
 }).then(() => {
   console.log('DB connected!');
 }).catch(err => {
