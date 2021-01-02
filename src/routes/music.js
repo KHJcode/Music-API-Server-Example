@@ -16,6 +16,16 @@ router.get('/', (req, res, next) => {
   }
 });
 
+router.get('/count/all', async (req, res, next) => {
+  try {
+    const data = await Music.count({});
+
+    res.status(200).json(data);
+  } catch (err) {
+    next(err);
+  }
+});
+
 router.get('/list/:n', lengthStdCheck, async (req, res, next) => {
   try {
     const { n } = req.params;
@@ -25,6 +35,33 @@ router.get('/list/:n', lengthStdCheck, async (req, res, next) => {
       order: [['id', 'DESC']],
       offset: (n - 1) * length_std,
       limit: n * length_std,
+    });
+
+    res.status(200).json(data);
+  } catch (err) {
+    next(err);
+  }
+});
+
+router.get('/count/search/:keyword', async (req, res, next) => {
+  try {
+    const { keyword } = req.params;
+
+    const data = await Music.count({
+      where: {
+        [Op.or]: [
+          {
+            name: {
+              [Op.like]: '%' + keyword + '%',
+            },
+          },
+          {
+            creater: {
+              [Op.like]: '%' + keyword + '%',
+            },
+          },
+        ],
+      },
     });
 
     res.status(200).json(data);
