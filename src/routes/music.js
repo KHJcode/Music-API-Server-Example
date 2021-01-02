@@ -66,6 +66,25 @@ router.get('/search/:keyword/:n', lengthStdCheck, async (req, res, next) => {
   }
 });
 
+router.get('/popular/:n', lengthStdCheck, async (req, res, next) => {
+  try {
+    const n = parseInt(req.params.n);
+
+    const data = await Music.findAll({
+      order: [['view', 'DESC']],
+      attributes: {
+        exclude: ['createdAt', 'updatedAt'],
+      },
+      offset: n - 1,
+      limit: n,
+    });
+
+    res.status(200).json(data);
+  } catch (err) {
+    next(err);
+  }
+});
+
 router.post('/view/:id', adminCheck, async (req, res, next) => {
   try {
     const { id } = req.params;
