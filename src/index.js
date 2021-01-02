@@ -13,7 +13,9 @@ import weatherRouter from './routes/weather';
 dotenv.config();
 
 const app = express();
+
 const prod = process.env.NODE_ENV === 'production';
+const test = process.env.NODE_ENV === 'test';
 
 app.set('port', prod ? process.env.PORT : '6060');
 
@@ -26,7 +28,7 @@ sequelize
     console.error(err);
   });
 
-if (prod) {
+if (prod || test) {
   app.use(hpp());
   app.use(helmet());
   app.use(cors());
