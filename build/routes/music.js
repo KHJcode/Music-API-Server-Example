@@ -181,13 +181,15 @@ router.post('/create', _admin.adminCheck, /*#__PURE__*/function () {
         name,
         file,
         creater,
-        image
+        image,
+        category
       } = req.body;
       yield _models.Music.create({
         name,
         file,
         creater,
-        image
+        image,
+        category
       }).then(result => {
         res.status(201).json(result ? 'success' : 'error');
       });
@@ -208,13 +210,15 @@ router.post('/update', _admin.adminCheck, /*#__PURE__*/function () {
         name,
         file,
         creater,
-        image
+        image,
+        category
       } = req.body;
       yield _models.Music.update({
         name,
         file,
         creater,
-        image
+        image,
+        category
       }, {
         where: {
           id
