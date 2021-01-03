@@ -122,6 +122,26 @@ router.get('/popular/:n', lengthStdCheck, async (req, res, next) => {
   }
 });
 
+router.get('/category/:keyword/:n', lengthStdCheck, async (req, res, next) => {
+  try {
+    const { keyword, n } = req.params;
+
+    const data = await Music.findAll({
+      where: { category: keyword },
+      order: [['id', 'DESC']],
+      attributes: {
+        exclude: ['createdAt', 'updatedAt'],
+      },
+      offset: (n - 1) * length_std,
+      limit: n * length_std,
+    });
+
+    res.status(200).json(data);
+  } catch (err) {
+    next(err);
+  }
+});
+
 router.post('/view/:id', adminCheck, async (req, res, next) => {
   try {
     const { id } = req.params;

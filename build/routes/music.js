@@ -156,8 +156,36 @@ router.get('/popular/:n', _length.lengthStdCheck, /*#__PURE__*/function () {
     return _ref5.apply(this, arguments);
   };
 }());
-router.post('/view/:id', _admin.adminCheck, /*#__PURE__*/function () {
+router.get('/category/:keyword/:n', _length.lengthStdCheck, /*#__PURE__*/function () {
   var _ref6 = _asyncToGenerator(function* (req, res, next) {
+    try {
+      var {
+        keyword,
+        n
+      } = req.params;
+      var data = yield _models.Music.findAll({
+        where: {
+          category: keyword
+        },
+        order: [['id', 'DESC']],
+        attributes: {
+          exclude: ['createdAt', 'updatedAt']
+        },
+        offset: (n - 1) * length_std,
+        limit: n * length_std
+      });
+      res.status(200).json(data);
+    } catch (err) {
+      next(err);
+    }
+  });
+
+  return function (_x16, _x17, _x18) {
+    return _ref6.apply(this, arguments);
+  };
+}());
+router.post('/view/:id', _admin.adminCheck, /*#__PURE__*/function () {
+  var _ref7 = _asyncToGenerator(function* (req, res, next) {
     try {
       var {
         id
@@ -170,12 +198,12 @@ router.post('/view/:id', _admin.adminCheck, /*#__PURE__*/function () {
     }
   });
 
-  return function (_x16, _x17, _x18) {
-    return _ref6.apply(this, arguments);
+  return function (_x19, _x20, _x21) {
+    return _ref7.apply(this, arguments);
   };
 }());
 router.post('/create', _admin.adminCheck, /*#__PURE__*/function () {
-  var _ref7 = _asyncToGenerator(function* (req, res, next) {
+  var _ref8 = _asyncToGenerator(function* (req, res, next) {
     try {
       var {
         name,
@@ -198,12 +226,12 @@ router.post('/create', _admin.adminCheck, /*#__PURE__*/function () {
     }
   });
 
-  return function (_x19, _x20, _x21) {
-    return _ref7.apply(this, arguments);
+  return function (_x22, _x23, _x24) {
+    return _ref8.apply(this, arguments);
   };
 }());
 router.post('/update', _admin.adminCheck, /*#__PURE__*/function () {
-  var _ref8 = _asyncToGenerator(function* (req, res, next) {
+  var _ref9 = _asyncToGenerator(function* (req, res, next) {
     try {
       var {
         id,
@@ -231,12 +259,12 @@ router.post('/update', _admin.adminCheck, /*#__PURE__*/function () {
     }
   });
 
-  return function (_x22, _x23, _x24) {
-    return _ref8.apply(this, arguments);
+  return function (_x25, _x26, _x27) {
+    return _ref9.apply(this, arguments);
   };
 }());
 router.post('/delete', _admin.adminCheck, /*#__PURE__*/function () {
-  var _ref9 = _asyncToGenerator(function* (req, res, next) {
+  var _ref10 = _asyncToGenerator(function* (req, res, next) {
     try {
       var {
         id
@@ -253,8 +281,8 @@ router.post('/delete', _admin.adminCheck, /*#__PURE__*/function () {
     }
   });
 
-  return function (_x25, _x26, _x27) {
-    return _ref9.apply(this, arguments);
+  return function (_x28, _x29, _x30) {
+    return _ref10.apply(this, arguments);
   };
 }());
 var _default = router;
