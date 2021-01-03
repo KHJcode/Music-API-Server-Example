@@ -138,10 +138,10 @@ router.post('/view/:id', adminCheck, async (req, res, next) => {
 
 router.post('/create', adminCheck, async (req, res, next) => {
   try {
-    const { name, file, creater } = req.body;
+    const { name, file, creater, image } = req.body;
 
     await Music
-      .create({ name, file, creater })
+      .create({ name, file, creater, image })
       .then(result => {
         res.status(201).json(result ? 'success' : 'error');
       });
@@ -152,10 +152,10 @@ router.post('/create', adminCheck, async (req, res, next) => {
 
 router.post('/update', adminCheck, async (req, res, next) => {
   try {
-    const { id, name, file, creater } = req.body;
+    const { id, name, file, creater, image } = req.body;
     
     await Music
-      .update({ name, file, creater }, { where: { id }})
+      .update({ name, file, creater, image }, { where: { id }})
       .then(result => {
         res.status(201).json(result ? 'success' : 'error');
       });
