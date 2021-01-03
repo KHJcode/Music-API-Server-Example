@@ -180,12 +180,14 @@ router.post('/create', _admin.adminCheck, /*#__PURE__*/function () {
       var {
         name,
         file,
-        creater
+        creater,
+        image
       } = req.body;
       yield _models.Music.create({
         name,
         file,
-        creater
+        creater,
+        image
       }).then(result => {
         res.status(201).json(result ? 'success' : 'error');
       });
@@ -205,12 +207,14 @@ router.post('/update', _admin.adminCheck, /*#__PURE__*/function () {
         id,
         name,
         file,
-        creater
+        creater,
+        image
       } = req.body;
       yield _models.Music.update({
         name,
         file,
-        creater
+        creater,
+        image
       }, {
         where: {
           id
@@ -225,6 +229,28 @@ router.post('/update', _admin.adminCheck, /*#__PURE__*/function () {
 
   return function (_x22, _x23, _x24) {
     return _ref8.apply(this, arguments);
+  };
+}());
+router.post('/delete', _admin.adminCheck, /*#__PURE__*/function () {
+  var _ref9 = _asyncToGenerator(function* (req, res, next) {
+    try {
+      var {
+        id
+      } = req.body;
+      yield _models.Music.destroy({
+        where: {
+          id
+        }
+      }).then(result => {
+        res.status(201).json(result ? 'success' : 'error');
+      });
+    } catch (err) {
+      next(err);
+    }
+  });
+
+  return function (_x25, _x26, _x27) {
+    return _ref9.apply(this, arguments);
   };
 }());
 var _default = router;

@@ -24,6 +24,7 @@ _dotenv.default.config();
 
 var app = (0, _express.default)();
 var prod = process.env.NODE_ENV === 'production';
+var test = process.env.NODE_ENV === 'test';
 app.set('port', prod ? process.env.PORT : '6060');
 
 _models.sequelize.sync({
@@ -34,7 +35,7 @@ _models.sequelize.sync({
   console.error(err);
 });
 
-if (prod) {
+if (prod || test) {
   app.use((0, _hpp.default)());
   app.use((0, _helmet.default)());
   app.use((0, _cors.default)());

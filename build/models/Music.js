@@ -18,6 +18,9 @@ module.exports = (sequelize, DataTypes) => {
     },
     creater: {
       type: DataTypes.STRING(50)
+    },
+    image: {
+      type: DataTypes.STRING(200)
     }
   }, {
     timestamps: true
