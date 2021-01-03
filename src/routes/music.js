@@ -122,6 +122,18 @@ router.get('/popular/:n', lengthStdCheck, async (req, res, next) => {
   }
 });
 
+router.get('/count/category/:keyword', async (req, res, next) => {
+  try {
+    const { keyword } = req.params;
+
+    const data = await Music.count({ where: { category: keyword }});
+
+    res.status(200).json(data);
+  } catch (err) {
+    next(err);
+  }
+});
+
 router.get('/category/:keyword/:n', lengthStdCheck, async (req, res, next) => {
   try {
     const { keyword, n } = req.params;
