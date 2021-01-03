@@ -164,4 +164,19 @@ router.post('/update', adminCheck, async (req, res, next) => {
   }
 });
 
+router.post('/delete', adminCheck, async (req, res, next) => {
+  try {
+    const { id } = req.body;
+
+    await Music
+      .destroy({ where: { id }})
+      .then(result => {
+        res.status(201).json(result ? 'success' : 'error');
+      });
+  } catch (err) {
+    next(err);
+  }
+});
+
+
 export default router;
