@@ -7,7 +7,6 @@ import morgan from 'morgan';
 
 import { sequelize } from './models';
 import musicRouter from './routes/music';
-import weatherRouter from './routes/weather';
 
 
 dotenv.config();
@@ -39,7 +38,6 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true, limit: '30mb' }));
 
 app.use('/music', musicRouter);
-app.use('/weather', weatherRouter);
 
 app.get('*', (err, res, req, next) => {
   console.log(err);
