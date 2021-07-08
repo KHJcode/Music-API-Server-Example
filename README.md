@@ -1,7 +1,5 @@
 # Music API Server Example
 
-<br/>
-
 ## 📚 Description
 
 This is an example of a music API server with DB connection (Node.js, Express, Sequelize).
