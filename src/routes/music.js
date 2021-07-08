@@ -1,163 +1,77 @@
 import express from 'express';
-import { Op } from 'sequelize';
 import { sequelize, Music } from '../models';
-import { lengthStdCheck } from '../middleware/length';
-import { adminCheck } from '../middleware/admin';
+import {
+  FIND_ALL_MUSIC_OPTION,
+  FIND_MUSIC_WHERE_OPTION,
+  FIND_ONE_MUSIC_OPTION
+} from '../lib/music-option';
 
 const router = express.Router();
-const length_std = 15;
 
 
-router.get('/', (req, res, next) => {
-  try {
-    res.status(200).json('Hello, Music Router!');
-  } catch (err) {
-    next(err);
-  }
+router.get('/:id', async (req, res) => {
+  const music = await Music.findOne({
+    where: {
+      id: req.params.id
+    },
+    ...FIND_ONE_MUSIC_OPTION,
+  });
+
+  res.status(200).json(music);
 });
 
-router.get('/count/all', async (req, res, next) => {
+router.get('/', async (req, res, next) => {
   try {
-    const data = await Music.count({});
+    const { page } = req.query;
+    const word = req.query?.word;
+    const category = req.query?.category;
+    const order = req.query?.order;
+    const reverse = !!(req.query?.reverse);
 
-    res.status(200).json(data);
-  } catch (err) {
-    next(err);
-  }
-});
-
-router.get('/list/:n', lengthStdCheck, async (req, res, next) => {
-  try {
-    const { n } = req.params;
-
-    const data = await Music.findAll({
-      attributes: { exclude: ['createdAt', 'updatedAt'] },
-      order: [['id', 'DESC']],
-      offset: (n - 1) * length_std,
-      limit: n * length_std,
+    const music = await Music.findAll({
+      order: [
+        order === 'latest' ? 'id' :
+          order === 'popularity' ? 'view' : null,
+        reverse ? null : 'DESC',
+      ],
+      where: FIND_ALL_MUSIC_OPTION(word, category),
+      ...FIND_ALL_MUSIC_OPTION(parseInt(page)),
     });
 
-    res.status(200).json(data);
+    res.status(200).json(music);
   } catch (err) {
     next(err);
   }
 });
 
-router.get('/count/search/:keyword', async (req, res, next) => {
+router.get('/count', async (req, res, next) => {
   try {
-    const { keyword } = req.params;
+    const word = req.query?.word;
+    const category = req.query?.category;
 
-    const data = await Music.count({
-      where: {
-        [Op.or]: [
-          {
-            name: {
-              [Op.like]: '%' + keyword + '%',
-            },
-          },
-          {
-            creater: {
-              [Op.like]: '%' + keyword + '%',
-            },
-          },
-        ],
-      },
-    });
+    const count = await Music.count(FIND_MUSIC_WHERE_OPTION(word, category));
 
-    res.status(200).json(data);
+    res.status(200).json(count);
   } catch (err) {
     next(err);
   }
 });
 
-router.get('/search/:keyword/:n', lengthStdCheck, async (req, res, next) => {
-  try {
-    const { keyword, n } = req.params;
-
-    const data = await Music.findAll({
-      where: {
-        [Op.or]: [
-          {
-            name: {
-              [Op.like]: '%' + keyword + '%',
-            },
-          },
-          {
-            creater: {
-              [Op.like]: '%' + keyword + '%',
-            },
-          },
-        ],
-      },
-      order: [['name', 'DESC']],
-      attributes: {
-        exclude: ['createdAt', 'updatedAt'],
-      },
-      offset: (n - 1) * length_std,
-      limit: n * length_std,
-    });
-
-    res.status(200).json(data);
-  } catch (err) {
-    next(err);
-  }
-});
-
-router.get('/popular/:n', lengthStdCheck, async (req, res, next) => {
-  try {
-    const n = parseInt(req.params.n);
-
-    const data = await Music.findAll({
-      order: [['view', 'DESC']],
-      attributes: {
-        exclude: ['createdAt', 'updatedAt'],
-      },
-      offset: n - 1,
-      limit: n,
-    });
-
-    res.status(200).json(data);
-  } catch (err) {
-    next(err);
-  }
-});
-
-router.get('/count/category/:keyword', async (req, res, next) => {
-  try {
-    const { keyword } = req.params;
-
-    const data = await Music.count({ where: { category: keyword }});
-
-    res.status(200).json(data);
-  } catch (err) {
-    next(err);
-  }
-});
-
-router.get('/category/:keyword/:n', lengthStdCheck, async (req, res, next) => {
-  try {
-    const { keyword, n } = req.params;
-
-    const data = await Music.findAll({
-      where: { category: keyword },
-      order: [['id', 'DESC']],
-      attributes: {
-        exclude: ['createdAt', 'updatedAt'],
-      },
-      offset: (n - 1) * length_std,
-      limit: n * length_std,
-    });
-
-    res.status(200).json(data);
-  } catch (err) {
-    next(err);
-  }
-});
-
-router.post('/view/:id', adminCheck, async (req, res, next) => {
+router.get('/view/:id', async (req, res, next) => {
   try {
     const { id } = req.params;
+    const { view } = await Music.find({ id });
     
+    res.status(200).json(view);
+  } catch (err) {
+    next(err);
+  }
+});
+
+router.post('/view/:id', async (req, res, next) => {
+  try {
+    const { id } = req.params;
+
     await sequelize
       .query(`update music set view = view + 1 where id = ${id}`)
       .then(result => {
@@ -168,12 +82,10 @@ router.post('/view/:id', adminCheck, async (req, res, next) => {
   }
 });
 
-router.post('/create', adminCheck, async (req, res, next) => {
+router.post('/', async (req, res, next) => {
   try {
-    const { name, file, creater, image, category } = req.body;
-
     await Music
-      .create({ name, file, creater, image, category })
+      .create(req.body)
       .then(result => {
         res.status(201).json(result ? 'success' : 'error');
       });
@@ -182,26 +94,28 @@ router.post('/create', adminCheck, async (req, res, next) => {
   }
 });
 
-router.post('/update', adminCheck, async (req, res, next) => {
+router.put('/', async (req, res, next) => {
   try {
-    const { id, name, file, creater, image, category } = req.body;
-    
-    await Music
-      .update({ name, file, creater, image, category }, { where: { id }})
-      .then(result => {
-        res.status(201).json(result ? 'success' : 'error');
-      });
+    const id = req.body?.id;
+
+    if (id) {
+      await Music
+        .update(req.body, { where: { id } })
+        .then(result => {
+          res.status(201).json(result ? 'success' : 'error');
+        });
+    }
   } catch (err) {
     next(err);
   }
 });
 
-router.post('/delete', adminCheck, async (req, res, next) => {
+router.delete('/:id', async (req, res, next) => {
   try {
-    const { id } = req.body;
+    const { id } = req.params;
 
     await Music
-      .destroy({ where: { id }})
+      .destroy({ where: { id } })
       .then(result => {
         res.status(201).json(result ? 'success' : 'error');
       });

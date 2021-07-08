@@ -13,10 +13,10 @@ dotenv.config();
 
 const app = express();
 
-const prod = process.env.NODE_ENV === 'production';
-const test = process.env.NODE_ENV === 'test';
+const isProd = process.env.NODE_ENV === 'production';
+const isTest = process.env.NODE_ENV === 'test';
 
-app.set('port', prod ? process.env.PORT : '6060');
+app.set('port', isProd ? process.env.PORT : '6060');
 
 sequelize
   .sync({ force: false })
@@ -27,13 +27,13 @@ sequelize
     console.error(err);
   });
 
-if (prod || test) {
+if (isProd || isTest) {
   app.use(hpp());
   app.use(helmet());
   app.use(cors());
 }
 
-app.use(morgan(prod ? 'combined' : 'dev'));
+app.use(morgan(isProd ? 'combined' : 'dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true, limit: '30mb' }));
 

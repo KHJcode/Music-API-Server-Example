@@ -1,5 +1,4 @@
 module.exports = (sequelize, DataTypes) => {
-
   const Music = sequelize.define('Music', {
     name: {
       type: DataTypes.STRING(50),

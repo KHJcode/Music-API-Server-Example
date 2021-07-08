@@ -1,25 +1,50 @@
 # Music API Server Example
-This is an example of a music API server with DB connection (Sequelize).
 
-<br/><br/>
+<br/>
 
-# Run
+## 📚 Description
 
-### Setup
-```
-npm i
+This is an example of a music API server with DB connection (Node.js, Express, Sequelize).
+
+<br/>
+
+## 🛠️ Installation
+
+```bash
+$ npm install
 ```
 
 <br/>
 
-### Development
-```
-npm run dev
+## 🚀 Running the app
+
+```bash
+# development
+$ npm run dev
+
+# build
+$ npm run build
+
+# production mode
+$ npm run start
 ```
 
 <br/>
 
-### Production
+## 🔒 Environment configuration
+
 ```
-npm run start
+NODE_ENV
+
+DB_NAME
+DB_PORT
+DB_HOST
+DB_USERNAME
+DB_PASSWORD
+
+JWT_ACCESS_TOKEN_SECRET
+
+TWILIO_ACCOUNT_SID
+TWILIO_AUTH_TOKEN
+TWILIO_NUMBER
 ```
